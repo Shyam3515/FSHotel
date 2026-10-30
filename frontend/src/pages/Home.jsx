@@ -121,7 +121,7 @@ export default function Home() {
         <div className="container">
           <div className="feature-grid">
             <div className="feature-copy">
-              <span className="eyebrow">WHY HOTELÉ</span>
+              <span className="eyebrow">WHY HOTELOǴ</span>
               <h2>
                 More than a room.
                 <br />
