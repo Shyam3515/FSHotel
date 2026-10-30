@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, ShieldCheck, Sparkles, Headphones, Quote } from "lucide-react";
+import {
+  ArrowRight,
+  ShieldCheck,
+  Sparkles,
+  Headphones,
+  Quote,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import SectionHeading from "../components/SectionHeading";
@@ -121,7 +127,7 @@ export default function Home() {
         <div className="container">
           <div className="feature-grid">
             <div className="feature-copy">
-              <span className="eyebrow">WHY HOTELÉ</span>
+              <span className="eyebrow">WHY HOTELOǴ</span>
               <h2>
                 More than a room.
                 <br />
