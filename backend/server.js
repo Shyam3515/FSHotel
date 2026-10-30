@@ -25,12 +25,18 @@ const app = express();
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
+const allowedOrigins = [
+"https://hotelog.netlify.app",
+"http://localhost:5173",
+];
+
 app.use(
-  cors({
-    origin: [process.env.CLIENT_URL || "https://hotelog.netlify.app"],
-    credentials: true,
-  }),
-);
+cors({
+origin: function (origin, callback) {
+// Allow requests without an Origin header, such as server-to-server requests.
+if (!origin || allowedOrigins.includes(origin)) {
+return callback(null, true);
+}
 
 /* ---------- Logging ---------- */
 if (process.env.NODE_ENV !== "production") {
