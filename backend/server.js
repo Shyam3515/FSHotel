@@ -1,5 +1,7 @@
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
@@ -9,17 +11,17 @@ import authRoutes from "./routes/authRoutes.js";
 import hotelRoutes from "./routes/hotelRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 
-dotenv.config();
+import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import { testEmailConnection } from "./utils/sendEmail.js";
 
-/* ---------- Connect DB ---------- */
+/* ---------- Connect Database ---------- */
 connectDB();
 
 const app = express();
 
-/* ---------- Core middleware ---------- */
+/* ---------- Core Middleware ---------- */
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -30,11 +32,12 @@ app.use(
   }),
 );
 
+/* ---------- Logging ---------- */
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
 
-/* ---------- Rate limiting ---------- */
+/* ---------- Rate Limiting ---------- */
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,
@@ -45,36 +48,47 @@ const limiter = rateLimit({
     message: "Too many requests, please try again later.",
   },
 });
+
 app.use("/api", limiter);
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 25,
+  standardHeaders: true,
+  legacyHeaders: false,
   message: {
     success: false,
     message: "Too many auth attempts, try again later.",
   },
 });
 
-/* ---------- Health check ---------- */
-app.get("/api/health", (req, res) =>
-  res.json({ success: true, message: "HOTEL OǴ API is running 🚀" }),
-);
+/* ---------- Health Check ---------- */
+app.get("/api/health", (req, res) => {
+  res.json({
+    success: true,
+    message: "HOTEL OG API is running 🚀",
+  });
+});
 
-/* ---------- Routes ---------- */
+/* ---------- API Routes ---------- */
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/payment", paymentRoutes);
-/* ---------- Errors ---------- */
+
+/* ---------- Error Handling ---------- */
 app.use(notFound);
 app.use(errorHandler);
 
-/* ---------- Start ---------- */
+/* ---------- Start Server ---------- */
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
+
+app.listen(PORT, () => {
   console.log(
-    `🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`,
-  ),
-);
+    `🚀 Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`,
+  );
+
+  // Test Gmail SMTP connection
+  testEmailConnection();
+});
